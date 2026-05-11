@@ -1,0 +1,49 @@
+¡Buenísimo! Estás siguiendo el orden lógico de un profesional. El profesor mencionó Render porque ahí es donde tu API va a "vivir" en internet cuando la termines, pero eso se hace al final (el despliegue).
+
+Ahora que ya tienes el puente construido con la base de datos, el siguiente paso técnico es definir la estructura de la información. En el mundo de MongoDB y Node.js, esto se llama crear los Modelos (Schemas).
+
+¿Qué sigue? El Paso 1: Definir el "Modelo de Artista"
+Como tu API se trata de colaboraciones musicales, la base de datos necesita saber qué datos vas a guardar de cada persona (nombre artístico, género, rol, etc.).
+
+Para esto usaremos Mongoose. Sigue estos pasos en tu VS Code:
+
+1. Crear la carpeta y el archivo
+En tu menú de la izquierda (donde vimos las carpetas antes), asegúrate de que dentro de conexion_musical_api exista la carpeta models.
+
+Crea un archivo nuevo ahí llamado: User.js (o Artista.js, como prefieras).
+
+2. Definir el Esquema
+Copia este código básico dentro de ese nuevo archivo. Es lo que definirá a los usuarios de tu plataforma "Fonta Music":
+
+JavaScript
+const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+    nombre: { type: String, required: true },
+    nombreArtistico: { type: String, required: true },
+    correo: { type: String, required: true, unique: true },
+    rol: { 
+        type: String, 
+        enum: ['Artista', 'Productor', 'Compositor'], 
+        default: 'Artista' 
+    },
+    generoMusical: [String], // Ejemplo: ['Reggaeton', 'Trap']
+    biografia: String,
+    redesSociales: {
+        instagram: String,
+        spotify: String
+    },
+    fechaRegistro: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model('User', UserSchema);
+¿Por qué hacemos esto ahora?
+Porque antes de crear las rutas (como /login o /perfil), necesitamos decirle a la API: "Oye, cuando alguien se registre, asegúrate de que tenga un nombre artístico y un correo válido".
+
+Tu tarea ahora:
+
+Crea ese archivo en la carpeta models.
+
+Dime si prefieres que el modelo sea general (User) o si quieres separar Artistas de Productores desde ya, según lo que conversaste con tu profesor.
+
+¡Cuando tengas el archivo creado, pasamos al siguiente nivel: Las Rutas!
