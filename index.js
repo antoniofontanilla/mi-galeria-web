@@ -1,29 +1,55 @@
 import express from "express";
+import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import userRoutes from "./routes/userRoutes.js"; // IMPORTANTE: Incluir el .js
 
-dotenv.config({ path: "./.env" });
+// Cargar variables de entorno del archivo .env
+dotenv.config();
 
 const app = express();
+
+// Middlewares globales
+app.use(cors());
 app.use(express.json());
 
-// Prefijo para todas las rutas de usuario
-app.use("/api/users", userRoutes);
-
-const connectDB = async () => {
+// --- DEFINICIÓN DE RUTA DESDE CERO ---
+// Creamos la ruta tipo GET directamente aquí para evitar importar archivos externos que puedan fallar
+app.get("/api/artistas", async (req, res) => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ Conexión exitosa a MongoDB Atlas");
+    // Accedemos directamente a la colección 'users' que ya vimos que existe en tu Atlas
+    const usuarios = await mongoose.connection.db
+      .collection("users")
+      .find({})
+      .toArray();
+
+    // Enviamos los datos directo al frontend
+    res.json(usuarios);
   } catch (error) {
-    console.error("❌ Error de conexión:", error.message);
-    process.exit(1);
+    res
+      .status(500)
+      .json({
+        error: "Error al obtener datos de la base de datos",
+        detalle: error.message,
+      });
   }
-};
+});
 
-connectDB();
+// --- CONEXIÓN A MONGOOSE ---
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("=========================================");
+    console.log("🚀 ¡CONECTADO EXITOSAMENTE A MONGO DB ATLAS!");
+    console.log("=========================================");
+  })
+  .catch((error) => {
+    console.log("=========================================");
+    console.log("❌ ERROR AL CONECTAR A MONGO DB:", error.message);
+    console.log("=========================================");
+  });
 
-const PORT = process.env.PORT || 3000;
+// Levantar el servidor
+const PORT = 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

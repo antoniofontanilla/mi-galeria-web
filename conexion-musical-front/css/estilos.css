@@ -1,0 +1,181 @@
+/* Variables de diseño obligatorias (Reto 2) */
+:root {
+  --bg-oscuro: #0f172a;
+  --bg-tarjeta: #1e293b;
+  --color-marca: #2563eb;
+  --texto-principal: #ffffff;
+  --texto-secundario: #94a3b8;
+  --borde-foco: #3b82f6;
+  --color-error: #ef4444;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background-color: var(--bg-oscuro);
+  color: var(--texto-principal);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #0b0f19;
+  padding: 25px 20px;
+  text-align: center;
+  border-bottom: 1px solid #334155;
+}
+
+h1 {
+  margin: 0 0 15px 0;
+  font-size: 2.2rem;
+  color: var(--color-marca);
+}
+
+.buscador-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.buscador-caja label {
+  font-size: 0.95rem;
+  color: var(--texto-secundario);
+}
+
+input[type="text"] {
+  padding: 12px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
+  color: var(--texto-principal);
+  font-size: 1rem;
+}
+
+/* Estado :focus obligatorio para accesibilidad (Reto 2) */
+input[type="text"]:focus,
+button:focus {
+  outline: 3px solid var(--borde-foco);
+  outline-offset: 2px;
+}
+
+main {
+  flex: 1;
+  padding: 30px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.control-acciones {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 35px;
+}
+
+button {
+  background-color: var(--color-marca);
+  color: var(--texto-principal);
+  border: none;
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Diseño de Galería en Grid Ordenada (Reto 2) */
+#galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+/* Estilo para las tarjetas */
+.tarjeta {
+  background-color: var(--bg-tarjeta);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Imagen que no se deforma (Reto 2) */
+.tarjeta img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.tarjeta h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.genero-tag {
+  background-color: #334155;
+  color: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  align-self: flex-start;
+}
+
+.tarjeta p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.status-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--texto-secundario);
+  padding: 40px 0;
+}
+
+.status-msg.error {
+  color: var(--color-error);
+}
+
+footer {
+  background-color: #0b0f19;
+  text-align: center;
+  padding: 20px;
+  margin-top: 50px;
+  border-top: 1px solid #334155;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+}
+
+/* Media Query para Diseño Móvil de 1 columna (Reto 2) */
+@media (max-width: 600px) {
+  #galeria {
+    grid-template-columns: 1fr;
+  }
+  input[type="text"] {
+    width: 100%;
+  }
+}
