@@ -1,92 +1,85 @@
-// Referencias limpias al DOM
+// js/app.js - Versión oficial usando la API de la lista del profesor
 const galeria = document.getElementById("galeria");
 const btnCargar = document.getElementById("cargar");
 const inputBuscar = document.getElementById("buscar");
 
-// URL de la API exacta definida en nuestro index.js
-const API_URL = "http://localhost:5000/api/artistas";
+// 🌐 URL de la API pública elegida de la lista (Usuarios de prueba)
+const API_URL = "https://jsonplaceholder.typicode.com/users";
 
 let listaArtistas = [];
 
-// Función para consumir los datos
+// Función asíncrona para consumir la API externa
 async function cargarArtistas() {
-  // Limpiamos mensajes anteriores y ponemos el estado de carga obligatorio
+  // 1. Estado de carga exigido por la pauta
   galeria.innerHTML =
-    "<p class='status-msg'>Cargando talentos emergentes...</p>";
+    "<p class='status-msg'>Cargando usuarios desde la API...</p>";
 
   try {
+    // Hacemos el fetch directo a internet (no a localhost)
     const response = await fetch(API_URL);
 
     if (!response.ok) {
-      throw new Error(`Error en el servidor: ${response.status}`);
+      throw new Error(`Error en la API: ${response.status}`);
     }
 
+    // Guardamos los datos que nos entrega JSONPlaceholder
     listaArtistas = await response.json();
     renderizarTarjetas(listaArtistas);
   } catch (error) {
-    // En caso de error real, se muestra el aviso en rojo
+    // Manejo de errores en pantalla
     galeria.innerHTML =
       "<p class='status-msg error'>No se pudo conectar con el servidor de música.</p>";
-    console.error("Error en la petición:", error);
+    console.error("Error al consultar la API pública:", error);
   }
 }
 
-// Función para dibujar las tarjetas en el HTML
-function renderizarTarjetas(artistas) {
+// Función para dibujar las tarjetas con la estructura de la nueva API
+function renderizarTarjetas(usuarios) {
   galeria.innerHTML = "";
 
-  if (artistas.length === 0) {
+  if (usuarios.length === 0) {
     galeria.innerHTML =
-      "<p class='status-msg'>No se encontraron artistas registrados.</p>";
+      "<p class='status-msg'>No se encontraron registros.</p>";
     return;
   }
 
-  artistas.forEach((artista) => {
-    // Validación estricta: si no viene el campo, saltamos el registro
-    if (!artista || !artista.nombreArtistico) return;
-
+  usuarios.forEach((usuario) => {
     const card = document.createElement("article");
     card.className = "tarjeta";
 
-    // Manejo seguro de campos vacíos o arreglos de género
-    const fotoPerfil =
-      artista.imagenPerfil || "https://via.placeholder.com/250";
-    const biografiaText =
-      artista.biografia || "Este artista aún no ha agregado una biografía.";
+    // Usamos un avatar gratuito de internet usando el ID del usuario para que cada uno tenga foto diferente y no salga roto
+    const fotoPerfil = `https://api.dicebear.com/7.x/bottts/svg?seed=${usuario.username}`;
 
-    // Como vimos que generoMusical es un Array en tu Atlas, lo unimos con comas si es un arreglo, o lo dejamos como texto si viene plano
-    const generoText = Array.isArray(artista.generoMusical)
-      ? artista.generoMusical.join(", ")
-      : artista.generoMusical || "Urbano";
+    // Mapeamos los campos reales que entrega JSONPlaceholder (name, email, company)
+    const nombreMostrar = usuario.name;
+    const emailMostrar = usuario.email;
+    const tagCiudad = usuario.address.city.toUpperCase(); // Usamos la ciudad como "Tag" visual
+    const fraseBiografia = `Trabaja en ${usuario.company.name}: "${usuario.company.catchPhrase}"`;
 
     card.innerHTML = `
-            <img src="${fotoPerfil}" alt="Foto de ${artista.nombreArtistico}">
-            <h3>${artista.nombreArtistico}</h3>
-            <span class="genero-tag">${generoText}</span>
-            <p>${biografiaText}</p>
+            <img src="${fotoPerfil}" alt="Avatar de ${nombreMostrar}" style="background: #2a2f3b; border-radius: 8px; padding: 10px;">
+            <h3>${nombreMostrar}</h3>
+            <span class="genero-tag">${tagCiudad}</span>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #b3b3b3;">${emailMostrar}</p>
+            <p>${fraseBiografia}</p>
         `;
 
     galeria.appendChild(card);
   });
 }
 
-// Buscador dinámico por género
+// Buscador dinámico adaptado a los nuevos datos (busca por Ciudad/Tag)
 inputBuscar.addEventListener("input", (e) => {
   const textoBusqueda = e.target.value.toLowerCase().trim();
 
-  const artistasFiltrados = listaArtistas.filter((artista) => {
-    // Manejo seguro si es array o string para el filtro
-    let generoStr = "";
-    if (Array.isArray(artista.generoMusical)) {
-      generoStr = artista.generoMusical.join(" ").toLowerCase();
-    } else if (artista.generoMusical) {
-      generoStr = artista.generoMusical.toLowerCase();
-    }
-    return generoStr.includes(textoBusqueda);
+  const filtrados = listaArtistas.filter((usuario) => {
+    const ciudad = usuario.address.city.toLowerCase();
+    const nombre = usuario.name.toLowerCase();
+    return ciudad.includes(textoBusqueda) || nombre.includes(textoBusqueda);
   });
 
-  renderizarTarjetas(artistasFiltrados);
+  renderizarTarjetas(filtrados);
 });
 
-// Evento del botón para gatillar la carga
+// Evento del botón
 btnCargar.addEventListener("click", cargarArtistas);
